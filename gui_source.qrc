@@ -1,0 +1,7 @@
+<RCC>
+  <qresource prefix="img">
+    <file alias="img_wh">source/white.jpeg</file>
+    <file alias="img_bk">source/black.jpeg</file>
+    <file alias="img_bg">source/background.jpeg</file>
+  </qresource>
+</RCC>
