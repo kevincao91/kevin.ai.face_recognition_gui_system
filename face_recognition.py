@@ -36,6 +36,7 @@ class FaceRecognition:
     # 测试图像预处理变换
     def get_test_img_preprocessing(self):
         # 数据预处理设置
+
         normMean = [0.5, 0.5, 0.5]
         normStd = [0.5, 0.5, 0.5]
         normTransform = transforms.Normalize(normMean, normStd)
@@ -64,6 +65,7 @@ class FaceRecognition:
     def load_model(self):
         # 调用已有模型
         model = resnet18(pretrained=False)
+
         # 提取fc层中固定的参数
         fc_features = model.fc.in_features
 
@@ -89,6 +91,9 @@ class FaceRecognition:
 
         model.eval()
 
+        if opt.cuda:
+            model = model.cuda()
+
         self.net = model
 
     def create_person_data(self):
@@ -96,19 +101,29 @@ class FaceRecognition:
         self.net.eval()
         it = iter(self.database_loader)
         images, labels = it.next()
-        images = Variable(images)
+
+        if opt.cuda:
+            images = Variable(images).cuda()
+        else:
+            images = Variable(images)
+
+        # 强制处理其他事物，防止GUI卡死
+        QApplication.processEvents()
+        
+        with torch.no_grad():
+            outputs = self.net(images)
 
         # 强制处理其他事物，防止GUI卡死
         QApplication.processEvents()
 
-        outputs = self.net(images)
-
-        # 强制处理其他事物，防止GUI卡死
-        QApplication.processEvents()
-
-        for i in range(len(labels)):
-            database[labels[i]] = outputs[i].data.numpy()
-            # print(labels[i], outputs[i].data.numpy())
+        if opt.cuda:
+            for i in range(len(labels)):
+                database[labels[i]] = outputs[i].data.cpu().numpy()
+                # print(labels[i], outputs[i].data.cpu().numpy())
+        else:
+            for i in range(len(labels)):
+                database[labels[i]] = outputs[i].data.numpy()
+                # print(labels[i], outputs[i].data.numpy())
 
         # print(database)
         self.database = database
@@ -134,14 +149,21 @@ class FaceRecognition:
         test_img = torch.unsqueeze(test_img, 0)
         # print(np.shape(test_img))
         # Step 1: Compute the target "encoding" for the image.
-        images = Variable(test_img)
+        if opt.cuda:
+            images = Variable(test_img).cuda()
+        else:
+            images = Variable(test_img)
         self.net.eval()
 
         # Step 1: Compute the encoding for the image.
-        encodings = self.net(images)
+        with torch.no_grad():
+            encodings = self.net(images)
         encoding = torch.squeeze(encodings)
         # print(np.shape(encoding))
-        encoding = encoding.data.numpy()
+        if opt.cuda:
+            encoding = encoding.data.cpu().numpy()
+        else:
+            encoding = encoding.data.numpy()
 
         # Step 2: Find the closest encoding #
 
@@ -153,7 +175,7 @@ class FaceRecognition:
 
             # Compute L2 distance between the target "encoding" and the current "emb" from the database. (≈ 1 line)
             dist = np.linalg.norm(encoding - db_enc)
-
+            print('监测与 %s 距离为： %f ' % (name, dist))
             # If this distance is less than the min_dist, then set min_dist to dist, and identity to name. (≈ 3 lines)
             if dist < min_dist:
                 min_dist = dist

@@ -1,6 +1,7 @@
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 import time
+import torch
 
 
 class Config:
@@ -24,12 +25,12 @@ class Config:
     # 配置程序所有的设置数据
     def __init__(self):
         #  初始化程序的设置参数
-        self.net_data_path = './model/0313133934_0.958_0.1149_resnet18_net_params.pkl'
-        self.net_best_margin = 8.60
-        self.net_input_img_size = 200
+        self.net_data_path = './model/0422030435_testacc_0.8677_resnet18_net_params.pkl'
+        self.net_best_margin = 88.60
+        self.net_input_img_size = 224
         self.database_dir = './database/'
-        self.video_show_box_size = 200
-
+        self.video_show_box_size = 224
+        self.cuda = True
         self.is_net_load_done = False
 
         #  初始化程序的设置变量
@@ -37,6 +38,19 @@ class Config:
         self.display_mw_view_index = 0
         self.display_mw_sys = None
         self.display_mw_sys_index = 0
+        
+        # 检查cuda设置
+        self.check_cuda()
+    
+    def check_cuda(self):
+        # torch.backends.cudnn.benchmark = True
+        if torch.cuda.is_available():
+            print('cuda is available')
+        if torch.cuda.is_available() and not self.cuda:
+            print("WARNING: You have a CUDA device, so you should probably run with cuda")
+        elif not torch.cuda.is_available() and self.cuda:
+            print("WARNING: You can't use CUDA device, so you should probably run without cuda")
+            self.cuda = False
 
     # 主窗口GUI上显示的viewlist滚动行
     def print_view_gui(self, string):

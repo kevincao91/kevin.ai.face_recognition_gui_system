@@ -227,6 +227,7 @@ class MainWindowCore(QMainWindow, Ui_MainWindow):
 
     # 功能函数 ============================================================
     def load_net_data_start(self):
+
         self.load_worker = LoadWorker()
         self.load_worker.load_signal.connect(fr.login_main)
 
@@ -288,9 +289,9 @@ class MainWindowCore(QMainWindow, Ui_MainWindow):
             # save 裁剪图
             print('当前图片采集', np.shape(crop_img))
             save_img = cvtColor(crop_img, COLOR_RGB2BGR)
-            cv2.imwrite('sample/' + time_str + '_检测图像.bmp', save_img)
+            cv2.imwrite('./sample/' + time_str + '_检测图像.bmp', save_img)
             # 为列表准备的图片
-            cv2.imwrite('sample/now.bmp', save_img)
+            cv2.imwrite('./sample/now.bmp', save_img)
             # 送给检测器
             fr.who_is_it(test_img)
         else:
