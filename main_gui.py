@@ -54,6 +54,7 @@ class MainWindowCore(QMainWindow, Ui_MainWindow):
         print('视频路径 : ', video_path)
         print('获取视频信息中...')
         self.set_fps_get_size()
+        self.cal_video_center_box()
         self.chk_label_size_change()
         # 更改按钮状态
         self.playButton.setIcon(self.style().standardIcon(QStyle.SP_MediaPlay))
@@ -104,7 +105,6 @@ class MainWindowCore(QMainWindow, Ui_MainWindow):
             print('显示区域大小改变，更改显示尺寸')
             self.video_label_size = now_video_label_size
             self.cal_show_size()
-            self.cal_video_center_box()
 
     # 状态控制 ============================================================
     def reset(self):
