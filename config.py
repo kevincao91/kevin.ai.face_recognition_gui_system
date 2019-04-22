@@ -25,8 +25,8 @@ class Config:
     # 配置程序所有的设置数据
     def __init__(self):
         #  初始化程序的设置参数
-        self.net_data_path = './model/0422030435_testacc_0.8677_resnet18_net_params.pkl'
-        self.net_best_margin = 88.60
+        self.net_data_path = './model/0422094143_testacc_0.8747_resnet18_net_params.pkl'
+        self.net_best_margin = 7.60
         self.net_input_img_size = 224
         self.database_dir = './database/'
         self.video_show_box_size = 224
